@@ -3,7 +3,7 @@
 
 [QUANTUMCT](https://www.quantumct.org/) X [RTRC](https://www.rtx.com/who-we-are/we-are-rtx/transformative-technologies/rtrc) X [QBRAID](https://www.qbraid.com/)
 
-## 👥 The Team: Quantum Command
+## 👥 The Team: Quantum French Vanilla
 We are **Quantum French Vanilla**, a multidisciplinary group from the University of Sherbrooke.
 
 * **Florence** – MS.c Math
@@ -43,9 +43,11 @@ We use the **Fisher-Jaikumar** heuristic to solve the "Cluster-First" part of th
   Each vehicle should only be able to go to a number of customers equal to its capacity.
   
   There should be only one client per stop.
+
   ![opt_constraint_2.png](opt_constraint_2.png)
 
   Each stop should only cover one client.
+
   ![opt_constraint_1.png](opt_constraint_1.png)
 
 ### 2. Quantum Routing (QAOA + XY-Mixer)
@@ -62,12 +64,12 @@ $$U_{XY}(\beta) = e^{-i \beta (X_i X_j + Y_i Y_j)}$$
 - **Optimizer:** We use the **COBYLA** classical optimizer to find the best angles $(\gamma, \beta)$. The optimizer then finds the minimum distance which satisfies the following equation:
   ![opt_equation.png](opt_equation.png)
 - **Warm Start:** We initialize the circuit near a diagonal classical solution to speed up convergence.
-- **Depth Sweep:** The solver automatically tests QAOA depths $p \in \{1, 2, 3\}$ to find the optimal balance between accuracy and gate noise.
+- **Depth Sweep:** The solver automatically test QAOA with $p \in \{1, 2, 3\}$ layers to find the optimal balance between accuracy and gate noise.
 
 ---
 
 ## 📊 Problem Instances
-We tested the solver on 6 distinct instances ranging from small-scale toy problems to complex 20-node distributions.
+We tested the solver on 5 distinct instances ranging from small-scale toy problems to complex 20-node distributions.
 
 | Instance | Customers | Vehicles | Capacity | Complexity                           |
 |:---------|:----------|:---------|:---------|:-------------------------------------|
@@ -81,7 +83,7 @@ We tested the solver on 6 distinct instances ranging from small-scale toy proble
 ## 📈 Visualizations & Results
 
 ### Convergence Analysis
-The solver generates convergence plots showing how the Ising energy decreases over classical iterations.
+The solver generates convergence plots showing how the Ising energy decreases over classical iterations. Other instances visualizations are available in the repository.
 
 ![convergence_instance4.png](convergence_instance4.png)
 
@@ -100,7 +102,7 @@ We have 20 customers, 5 vehicles and each vehicle can hold only 4 cups.
 ![new_haven_map.png](new_haven_map.png)
 
 ### The solution
-Final routes were found and our per-cluster ratio was calculated to be near-optimal.
+Final routes were found and our per-cluster ratio was calculated to be near-optimal. Variance between runs can be attributed to random seeds used for our variational circuit.
 
 ![convergence_instance7.png](convergence_instance7.png)
 
@@ -110,14 +112,14 @@ Final routes were found and our per-cluster ratio was calculated to be near-opti
 
 ## 🎛 Resource Usage
 
-This resource usage table gives the biggest usage of resource between all clusters of the same instance problem.
+This resource usage table gives the resource usage of the best solution between all clusters of the same instance problem.
 
 | CVRP Instance # | # of Qubits | # of Gate Operations | Execution Time (s) | 
 |:---------------:|:-----------:|:--------------------:|:------------------:|
-|        1        |      9      |         360          |        11.3        | 
-|        2        |      4      |          82          |        2.9         | 
-|        3        |      4      |          82          |        7.4         | 
-|        4        |      9      |         360          |        34.4        | 
+|        1        |      9      |         126          |        1.9         | 
+|        2        |      4      |          30          |        0.5         | 
+|        3        |      4      |          30          |        1.4         | 
+|        4        |      9      |         126          |        6.6         | 
 |        7        |     16      |         964          |       1166.2       | 
 
 ---
