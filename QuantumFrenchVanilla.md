@@ -44,11 +44,11 @@ We use the **Fisher-Jaikumar** heuristic to solve the "Cluster-First" part of th
   
   There should be only one client per stop.
 
-  ![opt_constraint_2.png](opt_constraint_2.png)
+  ![opt_constraint_2.png](./img/opt_constraint_2.png)
 
   Each stop should only cover one client.
 
-  ![opt_constraint_1.png](opt_constraint_1.png)
+  ![opt_constraint_1.png](./img/opt_constraint_1.png)
 
 ### 2. Quantum Routing (QAOA + XY-Mixer)
 For each cluster, we solve the TSP. We use **Position Encoding**: a qubit $x_{i,p}$ is $1$ if client $i$ is visited at stop $p$.
@@ -62,7 +62,7 @@ $$U_{XY}(\beta) = e^{-i \beta (X_i X_j + Y_i Y_j)}$$
 
 ### 3. Optimization & Warm Start
 - **Optimizer:** We use the **COBYLA** classical optimizer to find the best angles $(\gamma, \beta)$. The optimizer then finds the minimum distance which satisfies the following equation:
-  ![opt_equation.png](opt_equation.png)
+  ![opt_equation.png](./img/opt_equation.png)
 - **Warm Start:** We initialize the circuit near a diagonal classical solution to speed up convergence.
 - **Depth Sweep:** The solver automatically test QAOA with $p \in \{1, 2, 3\}$ layers to find the optimal balance between accuracy and gate noise.
 
@@ -85,12 +85,12 @@ We tested the solver on 5 distinct instances ranging from small-scale toy proble
 ### Convergence Analysis
 The solver generates convergence plots showing how the Ising energy decreases over classical iterations. Other instances visualizations are available in the repository.
 
-![convergence_instance4.png](convergence_instance4.png)
+![convergence_instance4.png](./img/convergence_instance4.png)
 
 ### Route Mapping
 Final routes are reconstructed as: `Depot → Client A → Client B → Depot`.
 
-![map_instance4.png](map_instance4.png)
+![map_instance4.png](./img/map_instance4.png)
 
 ---
 
@@ -99,14 +99,14 @@ Final routes are reconstructed as: `Depot → Client A → Client B → Depot`.
 ### The problem
 We have 20 customers, 5 vehicles and each vehicle can hold only 4 cups.
 
-![new_haven_map.png](new_haven_map.png)
+![new_haven_map.png](./img/new_haven_map.png)
 
 ### The solution
 Final routes were found and our per-cluster ratio was calculated to be near-optimal. Variance between runs can be attributed to random seeds used for our variational circuit.
 
-![convergence_instance7.png](convergence_instance7.png)
+![convergence_instance7.png](./img/convergence_instance7.png)
 
-![map_instance7.png](map_instance7.png)
+![map_instance7.png](./img/map_instance7.png)
 
 ---
 

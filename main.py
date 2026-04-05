@@ -21,16 +21,7 @@ NOTE sur le ratio d'approximation :
 """
 
 import numpy as np
-import itertools
-import time
-from scipy.optimize import minimize
-
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-from qiskit import QuantumCircuit
-from qiskit.primitives import StatevectorSampler
+from pipeline_instances import solve_instance
 
 np.random.seed(42)
 
@@ -38,7 +29,7 @@ np.random.seed(42)
 # 1. DONNÉES
 # ─────────────────────────────────────────────
 
-INSTANCES = {
+'''INSTANCES = {
     1: {"nv": 2, "capacity": 5,
         "customers": {1: (-2,2), 2: (-5,8), 3: (2,3)}},
     2: {"nv": 2, "capacity": 2,
@@ -63,14 +54,14 @@ INSTANCES = {
         }},
 }
 
-DEPOT = (0, 0)
+DEPOT = (0, 0)'''
 
 
 # ─────────────────────────────────────────────
 # 2. UTILITAIRES
 # ─────────────────────────────────────────────
 
-def euclidean(p1, p2):
+'''def euclidean(p1, p2):
     return np.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
 
 
@@ -85,14 +76,14 @@ def route_distance(route, customers):
 
 
 def k_min(customers, capacity):
-    return int(np.ceil(len(customers) / capacity))
+    return int(np.ceil(len(customers) / capacity))'''
 
 
 # ─────────────────────────────────────────────
 # 3. BASELINE OPTIMALE GLOBALE (indépendante de Fisher)
 # ─────────────────────────────────────────────
 
-def _generate_partitions(items, n_groups, max_per_group):
+'''def _generate_partitions(items, n_groups, max_per_group):
     """Génère toutes les partitions valides de items en n_groups."""
     if n_groups == 1:
         if len(items) <= max_per_group:
@@ -156,14 +147,14 @@ def compute_true_optimal(customers, capacity, nv):
                 best_routes = routes
                 best_k      = num_v
 
-    return best_dist, best_routes, best_k
+    return best_dist, best_routes, best_k'''
 
 
 # ─────────────────────────────────────────────
 # 4. FISHER-JAIKUMAR
 # ─────────────────────────────────────────────
 
-def select_seeds(customers, K):
+'''def select_seeds(customers, K):
     """K semences maximin : bien espacées autour du dépôt."""
     cids  = list(customers.keys())
     seeds = [max(cids, key=lambda c: euclidean(DEPOT, customers[c]))]
@@ -228,14 +219,14 @@ def fisher_jaikumar(customers, K, capacity, n_restarts=5):
             best_cost     = cost
             best_clusters = [cl[:] for cl in clusters]
 
-    return [cl for cl in best_clusters if cl]
+    return [cl for cl in best_clusters if cl]'''
 
 
 # ─────────────────────────────────────────────
 # 5. QUBO + ISING
 # ─────────────────────────────────────────────
 
-def build_tsp_qubo(cluster_ids, customers, penalty=10.0):
+'''def build_tsp_qubo(cluster_ids, customers, penalty=10.0):
     n     = len(cluster_ids)
     all_c = [DEPOT] + [customers[cid] for cid in cluster_ids]
     N     = len(all_c)
@@ -282,14 +273,14 @@ def qubo_to_ising(Q):
             h[i]    += Q[i][j] / 4
             h[j]    += Q[i][j] / 4
             offset  += Q[i][j] / 4
-    return h, J, offset
+    return h, J, offset'''
 
 
 # ─────────────────────────────────────────────
 # 6. CIRCUIT QAOA + XY-MIXEUR
 # ─────────────────────────────────────────────
 
-def build_qaoa_xy_circuit(n_clients, gamma, beta, h, J, eps=1e-6):
+'''def build_qaoa_xy_circuit(n_clients, gamma, beta, h, J, eps=1e-6):
     n_q = n_clients * n_clients
     qc  = QuantumCircuit(n_q)
     qc.h(range(n_q))
@@ -387,14 +378,14 @@ def run_qaoa(Q, n_clients, p_layers=1, n_restarts=3, eps=1e-6):
     qc_tmp.remove_final_measurements()
     n_gates = sum(qc_tmp.count_ops().values())
 
-    return best_bs, best_qubo, n_q, n_gates, best_hist
+    return best_bs, best_qubo, n_q, n_gates, best_hist'''
 
 
 # ─────────────────────────────────────────────
 # 7. DÉCODAGE
 # ─────────────────────────────────────────────
 
-def decode_tsp(bitstring, cluster_ids, n):
+'''def decode_tsp(bitstring, cluster_ids, n):
     bits   = [int(b) for b in reversed(bitstring)]
     matrix = np.array(bits).reshape(n, n)
     route, used, valid = [None]*n, set(), True
@@ -404,14 +395,14 @@ def decode_tsp(bitstring, cluster_ids, n):
             valid = False; break
         used.add(assigned[0])
         route[p] = cluster_ids[assigned[0]]
-    return route if (valid and len(used) == n) else list(cluster_ids)
+    return route if (valid and len(used) == n) else list(cluster_ids)'''
 
 
 # ─────────────────────────────────────────────
 # 8. RÉSOLUTION PAR CLUSTER
 # ─────────────────────────────────────────────
 
-def solve_clusters(clusters, customers, p_layers=1, eps=1e-6,
+'''def solve_clusters(clusters, customers, p_layers=1, eps=1e-6,
                    compute_cluster_ratios=False):
     """
     TSP QAOA sur chaque cluster.
@@ -474,14 +465,14 @@ def solve_clusters(clusters, customers, p_layers=1, eps=1e-6,
                   if cluster_ratios else None)
 
     return routes, total_dist, max_qubits, max_gates, best_history, \
-           cluster_ratios, mean_ratio
+           cluster_ratios, mean_ratio'''
 
 
 # ─────────────────────────────────────────────
 # 9. PIPELINE PAR INSTANCE
 # ─────────────────────────────────────────────
 
-def solve_instance(instance_id, p_values=(1, 2, 3), eps=1e-6):
+'''def solve_instance(instance_id, p_values=(1, 2, 3), eps=1e-6):
     """
     Pour chaque p ∈ p_values :
       - Cherche le meilleur k ∈ [k_min, nv]
@@ -637,14 +628,14 @@ def solve_instance(instance_id, p_values=(1, 2, 3), eps=1e-6):
     plot_convergence(instance_id, convergence_data, p_values, true_optimal)
     plot_routes_map(instance_id, best_overall["routes"], customers, best_overall["p"])
 
-    return convergence_data
+    return convergence_data'''
 
 
 # ─────────────────────────────────────────────
 # 10. CARTE DES ROUTES
 # ─────────────────────────────────────────────
 
-VEHICLE_COLORS = [
+'''VEHICLE_COLORS = [
     "#534AB7", "#1D9E75", "#D85A30", "#BA7517",
     "#E24B4A", "#185FA5", "#639922", "#D4537E",
 ]
@@ -719,14 +710,14 @@ def plot_routes_map(instance_id, routes, customers, p_best):
     path = f"map_instance{instance_id}.png"
     plt.savefig(path, dpi=150, bbox_inches="tight")
     plt.close()
-    print(f"  Carte des routes : {path}")
+    print(f"  Carte des routes : {path}")'''
 
 
 # ─────────────────────────────────────────────
 # 11. GRAPHIQUE DE CONVERGENCE
 # ─────────────────────────────────────────────
 
-def plot_convergence(instance_id, convergence_data, p_values, true_optimal=None):
+'''def plot_convergence(instance_id, convergence_data, p_values, true_optimal=None):
     COLORS = {1: "#534AB7", 2: "#1D9E75", 3: "#D85A30"}
 
     has_ratio = true_optimal is not None
@@ -793,7 +784,7 @@ def plot_convergence(instance_id, convergence_data, p_values, true_optimal=None)
                      f"{d:.3f}",
                      ha="center", va="bottom", fontsize=9, color="#2C2C2A")
         ax2.set_xlabel("Depth p")
-        ax2.set_ylabel("Total distance QAOA")
+        ax2.set_ylabel("Distance totale QAOA")
         ax2.set_title("Solution Quality (no exact baseline)")
 
     ax2.spines[["top","right"]].set_visible(False)
@@ -801,7 +792,7 @@ def plot_convergence(instance_id, convergence_data, p_values, true_optimal=None)
     path = f"convergence_instance{instance_id}.png"
     plt.savefig(path, dpi=150, bbox_inches="tight")
     plt.close()
-    print(f"  Graphique : {path}")
+    print(f"  Graphique : {path}")'''
 
 
 # ─────────────────────────────────────────────
