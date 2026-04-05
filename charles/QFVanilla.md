@@ -12,26 +12,7 @@ This repository contains a **hybrid quantum-classical solver** for the **Capacit
 - Solving each cluster using **QAOA** with qBraid SDK  
 - Parallel execution across clusters for speed  
 - Early stopping and convergence tracking  
-- Interactive maps and benchmarking visualizations  
-
----
-
-## Repository Structure
-
-```text
-CVRP-QAOA-Hybrid/
-│
-├─ README.md
-├─ requirements.txt
-├─ hybrid_solver.py       # Core clustering + QAOA pipeline
-├─ map_viz.py             # Interactive map visualization
-├─ analysis.py            # Benchmarking and performance plotting
-├─ run_instances.py       # Runs latest CVRP instances and exports solutions
-│
-├─ solutions/             # Solution text files (Instance1.txt, ...)
-├─ maps/                  # Interactive HTML route maps
-└─ figures/               # Benchmark and convergence plots
-````
+- Interactive maps and benchmarking visualizations
 
 ---
 

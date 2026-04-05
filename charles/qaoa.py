@@ -7,7 +7,10 @@ from qbraid import QbraidProvider
 import numpy as np
 import random
 
-def solve_qubo_qaoa_qbraid(Q, p=2, max_iter=60, patience=10, shots=1024):
+from qiskit.primitives import StatevectorSampler
+
+
+def solve_qubo_qaoa(Q, p=2, max_iter=60, patience=10, shots=1024):
     n = Q.shape[0]
     
     qc = QuantumCircuit(n)
@@ -31,12 +34,18 @@ def solve_qubo_qaoa_qbraid(Q, p=2, max_iter=60, patience=10, shots=1024):
         for i in range(n):
             qc.rx(2*betas[layer], i)
     
+    #for q in range(n):
+    #    qc.measure(q, q)
+
     qc.measure_all()
 
-    client = QuantumRuntimeClient(os.environ['QBRAID_API_KEY'])
+    print(f"{qc.count_ops()}")
+    print(f"{qc.size()}")
+
+    """client = QuantumRuntimeClient(os.environ['QBRAID_API_KEY'])
     provider = QbraidProvider(client=client)
-    device = provider.get_device("qbraid:qbraid:sim:qir-sv")
-    
+    device = provider.get_device("qbraid:qbraid:sim:qir-sv")"""
+    device = StatevectorSampler()
     best_energy = float("inf")
     best_solution = None
     history = []
@@ -47,9 +56,10 @@ def solve_qubo_qaoa_qbraid(Q, p=2, max_iter=60, patience=10, shots=1024):
         params.update({b: random.uniform(0,np.pi) for b in betas})
         
         bound = qc.assign_parameters(params)
-        job = device.run(bound, shots=shots)
-        counts = job.result().data.get_counts()
-        
+        job = device.run([bound], shots=shots)
+        # counts = job[0].result().data.get_counts()
+        counts = job.result()[0].data.meas.get_counts()
+
         improved = False
         
         for bitstring in counts:
@@ -65,5 +75,6 @@ def solve_qubo_qaoa_qbraid(Q, p=2, max_iter=60, patience=10, shots=1024):
         
         if no_improve >= patience:
             break
-    
-    return best_solution, best_energy, history
+
+    ops = sum(op for op in qc.count_ops().values())
+    return best_solution, best_energy, history, qc.num_qubits, ops

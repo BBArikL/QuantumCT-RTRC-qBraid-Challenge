@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from cvrp_solver import solve_cvrp_parallel
 from dotenv import load_dotenv
-from visualization import create_route_map, save_map
+from visualization import create_route_map, save_map, calculate_total_distance
 
 # Import your existing hybrid solver and visualization modules
 
@@ -58,7 +58,7 @@ instances = {
             5: (3,2), 6: (0,2), 7: (-2,3), 8: (-4,3),
             9: (2,3), 10: (2,7), 11: (-2,5), 12: (-1,4)
         },
-        "demands": [0]*13,
+        "demands": [0] + [1]*12,
         "vehicles": 4,
         "capacity": 3
     }
@@ -96,7 +96,7 @@ for inst_num, inst in instances.items():
     start_time = time.time()
     
     # Solve CVRP with parallel clusters
-    results, total_cost = solve_cvrp_parallel(
+    results, total_cost, max_ops, max_qubits, n_clusters = solve_cvrp_parallel(
         distance_matrix=np.array([
             [np.linalg.norm(np.array(coords[i])-np.array(coords[j])) 
              for j in range(len(coords))] 
@@ -115,17 +115,15 @@ for inst_num, inst in instances.items():
     
     # Optional: generate interactive map
     m = create_route_map(results, coords, depot=0)
+    distance = calculate_total_distance(results, coords, depot=0)
     save_map(m, filename=f"Instance{inst_num}_map.html")
-    
-    # Record resource usage
-    # Here placeholders: # of qubits and # of gates (can be measured from QAOA circuit if available)
-    n_qubits = len(coords)
-    n_gates = 1000  # placeholder, replace with actual circuit stats if possible
     
     resource_usage.append({
         "Instance": inst_num,
-        "Qubits": n_qubits,
-        "Gate Ops": n_gates,
+        "# of clusters": n_clusters,
+        "Qubits": max_qubits,
+        "Gate Ops": max_ops,
+        "Distance": distance,
         "Exec Time": round(exec_time,2)
     })
 

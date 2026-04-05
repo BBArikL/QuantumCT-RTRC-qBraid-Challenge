@@ -1,22 +1,23 @@
 from concurrent.futures import ThreadPoolExecutor
 
 from hybrid_solver import HybridClusterer
-from qaoa import solve_qubo_qaoa_qbraid
+from qaoa import solve_qubo_qaoa
 from tsp_qubo import TSP_QUBO
 
 
 def solve_cluster(cluster, distance_matrix, depot=0):
     tsp = TSP_QUBO(distance_matrix, cluster, depot=depot)
     Q = tsp.build_qubo()
-    
-    solution, energy, history = solve_qubo_qaoa_qbraid(Q)
+    solution, energy, history, n_qubits, n_ops = solve_qubo_qaoa(Q)
     route = tsp.decode(solution)  # decode automatically wraps depot
     
     return {
         "cluster": cluster,
         "route": route,
         "energy": energy,
-        "history": history
+        "history": history,
+        "n_qubits": n_qubits,
+        "n_ops": n_ops,
     }
 
 def solve_cvrp_parallel(distance_matrix, demands, capacity, coords, depot=0):
@@ -31,4 +32,6 @@ def solve_cvrp_parallel(distance_matrix, demands, capacity, coords, depot=0):
             results.append(f.result())
     
     total_cost = sum(r["energy"] for r in results)
-    return results, total_cost
+    max_ops = max(r["n_ops"] for r in results)
+    max_qubits = max(r["n_qubits"] for r in results)
+    return results, total_cost, max_ops, max_qubits, len(clusters)
