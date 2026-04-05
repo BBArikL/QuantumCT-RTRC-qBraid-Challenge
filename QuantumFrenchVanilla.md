@@ -39,7 +39,14 @@ We use the **Fisher-Jaikumar** heuristic to solve the "Cluster-First" part of th
 - **Generalized Assignment:** Customers are assigned to seeds based on the **minimum insertion cost**:
   $$c_{ik} = d(0, i) + d(i, s_k) - d(0, s_k)$$
   where $d$ is Euclidean distance, $0$ is the depot, $i$ is the customer, and $s_k$ is the seed.
-- **Constraints:** Assignments strictly respect the vehicle capacity.
+- **Constraints:** 
+  Each vehicle should only be able to go to a number of customers equal to its capacity.
+  
+  There should be only one client per stop.
+  ![opt_constraint_2.png](opt_constraint_2.png)
+
+  Each stop should only cover one client.
+  ![opt_constraint_1.png](opt_constraint_1.png)
 
 ### 2. Quantum Routing (QAOA + XY-Mixer)
 For each cluster, we solve the TSP. We use **Position Encoding**: a qubit $x_{i,p}$ is $1$ if client $i$ is visited at stop $p$.
@@ -52,7 +59,8 @@ $$U_{XY}(\beta) = e^{-i \beta (X_i X_j + Y_i Y_j)}$$
 **Why XY?** In a TSP tour, each time step must have exactly one city. The XY-mixer preserves the **Hamming Weight** of the bitstring. If we start in a "one-hot" state (one city per stop), the quantum computer *only* explores other one-hot states. This drastically reduces the search space and removes the need for heavy constraint penalties.
 
 ### 3. Optimization & Warm Start
-- **Optimizer:** We use the **COBYLA** classical optimizer to find the best angles $(\gamma, \beta)$.
+- **Optimizer:** We use the **COBYLA** classical optimizer to find the best angles $(\gamma, \beta)$. The optimizer then finds the minimum distance which satisfies the following equation:
+  ![opt_equation.png](opt_equation.png)
 - **Warm Start:** We initialize the circuit near a diagonal classical solution to speed up convergence.
 - **Depth Sweep:** The solver automatically tests QAOA depths $p \in \{1, 2, 3\}$ to find the optimal balance between accuracy and gate noise.
 
@@ -123,7 +131,7 @@ This resource usage table gives the biggest usage of resource between all cluste
 ## 🏁 Summary of Global Approximation
 The project calculates a **Global Approximation Ratio**:
 $$\alpha = \frac{\text{Total Distance (QAOA)}}{\text{Total Distance (Optimal Brute Force)}}$$
-This metric allows us to benchmark exactly how much "Quantum Advantage" we are gaining (or how much noise we are fighting) compared to a perfectly solved classical baseline for each cluster. If the global ratio is too complex, we calculate the ratio for each cluster.
+This metric allows us to benchmark our solution to a perfectly solved classical baseline for each cluster. If the global ratio is too complex, we calculate the ratio for each cluster instead.
 
 ---
 *Developed for the 2026 YQuantum Hackathon.*
